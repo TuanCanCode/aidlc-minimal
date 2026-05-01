@@ -107,12 +107,14 @@ Present the plan inline:
 
 **Units**: [1 / N — list names if multiple]
 **Build order**: [unit sequence or "single unit"]
+**Implementation tracks**: [Backend / Frontend / Mobile — list all that apply]
 
 [For each unit:]
 ### [Unit name]
 - Files to create: [list]
 - Files to modify: [list]
 - Key logic: [1–2 sentences]
+- Tracks: [Backend / Frontend / Mobile]
 
 **Total steps**: ~[N]
 

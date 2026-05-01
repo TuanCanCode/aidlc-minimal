@@ -41,7 +41,10 @@ Scope analysis → Component/unit decomposition → Design for complex cases
 **Gate**: Present execution plan inline → wait for user approval
 
 ### Phase 3 — BUILD (always)
-Show code plan inline → generate immediately → append build & test instructions
+Detect implementation tracks (Backend / Frontend / Mobile) → user chooses order if multi-track → generate code per track with per-track gate → testing → build instructions
+
+**Single-track**: skips track selection, one code generation pass.
+**Multi-track**: completes one track → user reviews → next track → user reviews.
 
 **Gate**: Present completion summary → wait for user approval
 

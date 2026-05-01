@@ -4,23 +4,76 @@
 
 ---
 
-## Step 1: Show Code Plan (inline, no separate approval)
+## Step 1: Determine Implementation Tracks
 
-Before generating any code, present a brief inline checklist:
+Analyse the plan (Phase 2) or requirements (Phase 1) to identify which implementation tracks are needed:
+
+| Track | When to include |
+|---|---|
+| **Backend** | API endpoints, services, data models, business logic, database changes, infrastructure |
+| **Frontend** | Web UI components, pages, state management, API integration |
+| **Mobile** | Mobile app screens, native features, mobile API integration |
+
+### Track detection rules
+
+- **Single-track** (backend only, frontend only, or mobile only) → skip the track selection prompt, proceed directly to code generation for that track
+- **Multi-track** (e.g. backend + frontend, backend + mobile) → present the track selection prompt (Step 2)
+- A task can have at most 3 tracks: Backend, Frontend, Mobile
+
+---
+
+## Step 2: Track Selection (multi-track only)
+
+When multiple tracks are detected, present the implementation order choice:
 
 ```
-## Code Generation Plan
+## Implementation Tracks
+
+This task requires work across multiple tracks:
+
+| # | Track | Scope |
+|---|---|---|
+| 1 | Backend | [brief scope — e.g. "3 API endpoints, 2 services, 1 migration"] |
+| 2 | Frontend | [brief scope — e.g. "2 pages, 3 components, API integration"] |
+
+**Recommended order**: Backend → Frontend
+(Backend APIs need to exist before the frontend can integrate with them)
+
+Which track do you want to implement first?
+- A) Backend first → then Frontend
+- B) Frontend first → then Backend
+- C) [Custom order if 3 tracks]
+```
+
+**Wait for user response.**
+
+After user chooses, record the order and proceed to Step 3 for the first track.
+
+**Recommendation logic**:
+- If frontend/mobile depends on backend APIs → recommend Backend first
+- If backend depends on frontend contracts (e.g. BFF pattern) → recommend Frontend first
+- If independent → recommend Backend first (convention)
+- Always let user override
+
+---
+
+## Step 3: Code Plan (per track, inline, no separate approval)
+
+Before generating code for the current track, present a brief inline checklist scoped to that track:
+
+```
+## Code Plan — [Track Name] (Track [N] of [M])
 
 - [ ] [Step 1 — description — target file path]
 - [ ] [Step 2 — description — target file path]
-- [ ] [Step N — ...]
+- [ ] [Step N — …]
 ```
 
 Then **immediately proceed** to generate — do NOT wait for approval of the plan itself.
 
 ---
 
-## Step 2: Generate Code
+## Step 4: Generate Code (per track)
 
 For each step in the plan:
 1. Generate the code
@@ -51,21 +104,51 @@ For each step in the plan:
 - Prevent SQL injection (use parameterized queries)
 - Sanitize output to prevent XSS
 
-### UI code
+### UI code (Frontend and Mobile tracks)
 Add `data-testid` to all interactive elements. Format: `{component}-{element-role}`.
 Example: `login-form-submit-button`, `user-list-search-input`.
 Use stable, semantic names — only change when element purpose changes.
 
 ---
 
-## Step 3: Testing (optional — ask user first)
+## Step 5: Track Gate (per track)
 
-After code generation is complete, present this prompt **before** generating any tests:
+After completing code generation for the current track, present a track completion summary:
+
+```
+## [Track Name] Complete ✓ (Track [N] of [M])
+
+**Created**:
+- `[path]` — [one-line description]
+
+**Modified** (brownfield):
+- `[path]` — [what changed]
+
+Please review. Request changes or approve to continue to [Next Track Name / Testing].
+```
+
+**Wait for explicit user confirmation.**
+
+- User approves → proceed to next track (Steps 3–5) or to Step 6 (Testing) if this was the last track
+- User requests changes → apply changes, re-present the track summary
+
+Log to `aidlc-docs/audit.md`:
+```
+[timestamp] TASK-NNN BUILD [track-name] complete: [N files created/modified]
+```
+
+**Repeat Steps 3–5 for each remaining track.**
+
+---
+
+## Step 6: Testing (optional — ask user after ALL tracks complete)
+
+After all tracks are complete, present this prompt **before** generating any tests:
 
 ```
 ## Testing
 
-Code generation is complete. Do you want to generate test cases for TASK-NNN?
+All implementation tracks are complete. Do you want to generate test cases for TASK-NNN?
 
 A) Yes — generate unit tests and integration test scenarios now
 B) No  — skip tests for now (you can run "generate tests for TASK-NNN" at any time later)
@@ -75,7 +158,7 @@ Wait for user response.
 
 ### If user chooses A — Generate tests
 
-Generate tests for every file created or modified in Step 2:
+Generate tests for every file created or modified across all tracks:
 
 **Unit tests**:
 - Co-locate test files with source files (follow existing test file conventions if brownfield)
@@ -84,6 +167,7 @@ Generate tests for every file created or modified in Step 2:
 
 **Integration test scenarios**:
 - Describe end-to-end flows that cross component boundaries
+- Include cross-track integration (e.g. frontend calling backend APIs)
 - Create test file if project already has integration test infrastructure; otherwise describe scenarios as structured comments
 
 After generating, record in `aidlc-docs/tasks/TASK-NNN.md`:
@@ -98,33 +182,47 @@ Record in `aidlc-docs/tasks/TASK-NNN.md`:
 **Tests**: Skipped
 ```
 
-Proceed directly to Step 4. Tests can be generated at any time using the retroactive flow (see "Retroactive Test Generation" section below).
+Proceed directly to Step 7. Tests can be generated at any time using the retroactive flow (see "Retroactive Test Generation" section below).
 
 ---
 
-## Step 4: Build & Test Instructions (auto, no approval)
+## Step 7: Build & Test Instructions (auto, no approval)
 
-After code generation, append instructions inline:
+After all tracks and testing, append instructions inline:
 
 ```
 ## Build & Test
 
+### Backend
 **Install dependencies**: `[command]`
 **Build**: `[command]`
+**Run**: `[command]`
 **Unit tests**: `[command]`
+
+### Frontend / Mobile
+**Install dependencies**: `[command]`
+**Build**: `[command]`
+**Run**: `[command]`
+**Unit tests**: `[command]`
+
+### Integration
 **Integration tests**: `[command or manual steps]`
 ```
 
+Only include sections for tracks that were implemented.
 **For complex multi-unit projects**: save full instructions in `aidlc-docs/build-and-test.md` instead.
 
 ---
 
 ## Gate: Phase 3 Approval
 
-Present a completion summary:
+Present a final completion summary across all tracks:
 
 ```
 ## Build Complete ✓
+
+**Tracks completed**: [Backend, Frontend, Mobile — list only those implemented]
+**Implementation order**: [Backend → Frontend]
 
 **Created**:
 - `[path]` — [one-line description]
@@ -143,18 +241,18 @@ Update `aidlc-docs/state.md` Phase field to `COMPLETE`.
 Update `aidlc-docs/tasks/TASK-NNN.md`:
 - Mark `[x] BUILD — approved [timestamp]`
 - Set Status to `Complete`
-- Fill in `## Deliverables` section with created/modified files
+- Fill in `## Deliverables` section with created/modified files grouped by track
 - Set `**Tests**` field to `Generated — [N tests]` or `Skipped`
 Update registry row status to `Complete`.
 Log to `aidlc-docs/audit.md`:
 ```
-[timestamp] TASK-NNN BUILD complete: [N files created/modified], tests [generated/skipped]
+[timestamp] TASK-NNN BUILD complete: [tracks], [N files created/modified], tests [generated/skipped]
 [timestamp] TASK-NNN BUILD approved: confirmed
 ```
 
 ---
 
-## Step 5: Documentation (optional — ask user)
+## Step 8: Documentation (optional — ask user)
 
 After BUILD is approved, present:
 
@@ -185,9 +283,21 @@ Record in `aidlc-docs/tasks/TASK-NNN.md`:
 ## Multi-Unit Execution
 
 When Phase 2 defined multiple units, execute Phase 3 for each unit sequentially:
-- Complete steps 1–2 (plan + code) for Unit 1 before starting Unit 2
-- Ask the testing question **once** after all units are generated (not per unit)
+- Within each unit, follow the track order (Steps 3–5 per track)
+- Ask the testing question **once** after all units and all tracks are generated (not per unit or per track)
 - A single Phase 3 Gate at the end covers all units
+
+---
+
+## Single-Track Shortcut
+
+When only one track is detected (Step 1):
+- Skip Step 2 (track selection)
+- Run Steps 3–4 once (no track label needed in the code plan)
+- Skip Step 5 (per-track gate) — proceed directly to Step 6 (Testing)
+- The Phase 3 Gate (final approval) is the only approval needed
+
+This keeps the workflow lean for backend-only or frontend-only tasks.
 
 ---
 
@@ -219,7 +329,7 @@ For each file in Deliverables:
 - Co-locate with source (follow existing test file naming conventions)
 - Follow the test framework already in use
 
-After all unit tests, generate integration test scenarios covering cross-component flows introduced by TASK-NNN.
+After all unit tests, generate integration test scenarios covering cross-component and cross-track flows introduced by TASK-NNN.
 
 **Step R4 — Update task file**
 

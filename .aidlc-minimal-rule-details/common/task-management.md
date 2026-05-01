@@ -60,8 +60,22 @@ Create `aidlc-docs/tasks/TASK-NNN.md`:
 - [ ] BUILD
 - [ ] DOCUMENT
 
+## Build Tracks
+[Populated after UNDERSTAND/PLAN — when tracks are determined]
+<!-- Example for multi-track:
+- [ ] Backend
+- [ ] Frontend
+-->
+
 ## Deliverables
 [Populated after BUILD phase completes]
+<!-- Group by track:
+### Backend
+- Created: `[path]` — [description]
+
+### Frontend
+- Created: `[path]` — [description]
+-->
 ```
 
 `**Tests**` field values:
@@ -128,17 +142,19 @@ Log to `aidlc-docs/audit.md`:
 
 Update `aidlc-docs/tasks/TASK-NNN.md` at each phase gate:
 
-| Event | Status change | Phase checkbox |
+| Event | Status change | Phase / Track checkbox |
 |---|---|---|
 | Task confirmed | (unchanged — stays `Open`) | — |
 | Phase 1 approved | `Open` → `In Progress` | `[x] UNDERSTAND — approved [timestamp]` |
 | Phase 2 approved | (unchanged) | `[x] PLAN — approved [timestamp]` |
 | Phase 2 skipped | (unchanged) | `[x] PLAN — skipped (simple scope)` |
+| Track completed (per track) | (unchanged) | `[x] Backend — completed [timestamp]` |
 | Phase 3 approved | `In Progress` → `Complete` | `[x] BUILD — approved [timestamp]` |
 | Phase 4 generated | (unchanged) | `[x] DOCUMENT — approved [timestamp]` |
 | Phase 4 skipped | (unchanged) | `[-] DOCUMENT — skipped` |
 
 Also update the registry row status column to match.
+Also update `## Build Tracks` checkboxes as each track completes.
 
 ---
 
@@ -148,10 +164,19 @@ When BUILD phase is approved, fill in the `## Deliverables` section:
 
 ```markdown
 ## Deliverables
+
+### Backend
 - Created: `[file path]` — [one-line description]
 - Modified: `[file path]` — [what changed]
-- Tests: [N unit tests]
+
+### Frontend
+- Created: `[file path]` — [one-line description]
+
+### Tests
+- [N unit tests], [N integration scenarios]
 ```
+
+For single-track tasks, omit the track headers — list deliverables flat.
 
 ---
 
