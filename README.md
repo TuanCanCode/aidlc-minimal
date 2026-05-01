@@ -19,12 +19,15 @@ Every time you ask Claude to implement something, it automatically:
 
 ## Setup
 
-### Step 1 — Copy files into your project root
+### Step 1 — Copy files into your project
 
-```
+You can place the files directly in your project root, or inside a `.claude` folder to keep your root directory clean.
+
+**Option A: Project root**
+```text
 your-project/
 ├── CLAUDE.md                                    ← copy from minimal/
-└── .aidlc-minimal-rule-details/               ← copy from minimal/
+└── .aidlc-minimal-rule-details/                 ← copy from minimal/
     ├── common/
     │   ├── task-management.md
     │   └── session-continuity.md
@@ -34,9 +37,24 @@ your-project/
         └── build.md
 ```
 
+**Option B: `.claude` folder**
+```text
+your-project/
+└── .claude/
+    ├── CLAUDE.md                                ← copy from minimal/
+    └── .aidlc-minimal-rule-details/             ← copy from minimal/
+        ├── common/
+        │   ├── task-management.md
+        │   └── session-continuity.md
+        └── phases/
+            ├── understand.md
+            ├── plan.md
+            └── build.md
+```
+
 ### Step 2 — Open project in Claude Code
 
-That's it. Claude reads `CLAUDE.md` automatically on startup.
+That's it. Claude reads `CLAUDE.md` automatically on startup (or from `.claude/CLAUDE.md`).
 
 ---
 
@@ -239,5 +257,10 @@ Continue TASK-003, or create a new task for a fresh request?
 | Decision log | Per-interaction audit | **Key decisions only** |
 | Task tracking | None | **TASK-NNN tickets** |
 | Documentation phase | Manual | **Optional, sources-driven** |
-| Extensions opt-in | Ceremony required | **Security built-in** |
 | Welcome message | Every session | **None** |
+
+---
+
+## Credits
+
+This project was heavily inspired by and adapted from the official [AWS AIDLC Workflows](https://github.com/awslabs/aidlc-workflows#usage). The minimal version strips away the enterprise ceremony while keeping the core adaptive and phase-based philosophy intact.
