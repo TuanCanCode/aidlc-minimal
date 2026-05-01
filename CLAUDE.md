@@ -20,7 +20,9 @@ Check `aidlc-docs/state.md`:
 - **Exists, in-progress task found** → follow `session-continuity.md` to resume
 
 ### Step 1 — TASK INIT
-Read task registry → assign next `TASK-NNN` → check RE artifact → create task file → announce task number.
+Read task registry → assign next `TASK-NNN` → check RE artifact → create task file → present task summary for review.
+
+**Gate**: Present task summary with initial assessment → user confirms, adds context, or corrects → then proceed to Phase 1.
 See `task-management.md` for full rules.
 
 ### Phase 1 — UNDERSTAND (always)
@@ -73,7 +75,7 @@ The agent reads the task's Deliverables, loads the source files, and generates t
 See `phases/build.md` — "Retroactive Test Generation" section for full rules.
 
 ### Approvals
-- Maximum 4 user approvals per project (one per phase gate)
+- Maximum 5 user approvals per task (task init gate + one per phase gate)
 - Auto-proceed between stages within the same phase
 - Phase 2 approval gate is skipped when Phase 2 itself is skipped
 - Phase 4 approval gate is skipped when user declines documentation
@@ -83,7 +85,7 @@ Log only key decisions in `aidlc-docs/audit.md`:
 ```
 [YYYY-MM-DDTHH:MM:SSZ] [PHASE] [EVENT]: brief summary
 ```
-Events: `start`, `requirements-approved`, `plan-approved`, `code-approved`, `docs-approved`
+Events: `start`, `task-confirmed`, `requirements-approved`, `plan-approved`, `code-approved`, `docs-approved`
 
 ### Directory Structure
 ```

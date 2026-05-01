@@ -7,7 +7,7 @@
 ## Task Lifecycle
 
 ```
-New request → Create TASK-NNN → UNDERSTAND → PLAN → BUILD → Complete
+New request → Create TASK-NNN → Review Gate → UNDERSTAND → PLAN → BUILD → Complete
 ```
 
 ---
@@ -84,11 +84,42 @@ Append a row to the registry table and increment `Next Task`:
 | TASK-NNN | [Short title] | Open | [ISO timestamp] |
 ```
 
-### 1.4 Announce the task number
+### 1.4 Present task for review (GATE)
 
-Tell the user at the very start:
+Present the task summary and wait for user confirmation before proceeding:
+
 ```
-**Task created: TASK-NNN** — [Short title]
+## Task Created: TASK-NNN — [Short title]
+
+**Request**:
+> [Original user request — verbatim]
+
+**Initial Assessment**:
+- **Type**: [New Feature / Bug Fix / Refactor / Upgrade / etc.]
+- **Scope**: [Single file / Component / Multi-component / System-wide]
+- **Project**: [Greenfield / Brownfield]
+
+**What I understand**:
+- [bullet 1 — key intent parsed from the request]
+- [bullet 2 — if applicable]
+- [bullet 3 — if applicable]
+
+Please review:
+- **Confirm** → proceed to UNDERSTAND phase
+- **Add context** → provide additional details, constraints, or references before I proceed
+- **Correct** → clarify if I misunderstood something
+```
+
+**Wait for explicit user response** before proceeding to Phase 1.
+
+**User responses**:
+- User confirms (e.g. "ok", "proceed", "looks good") → proceed to Phase 1
+- User provides additional context → append the new context to the `## Request` section in the task file, update the assessment if needed, then proceed to Phase 1
+- User corrects the understanding → update the task file title / request / assessment, re-present the summary for confirmation
+
+Log to `aidlc-docs/audit.md`:
+```
+[timestamp] TASK-NNN INIT confirmed: [type], [scope]
 ```
 
 ---
@@ -99,6 +130,7 @@ Update `aidlc-docs/tasks/TASK-NNN.md` at each phase gate:
 
 | Event | Status change | Phase checkbox |
 |---|---|---|
+| Task confirmed | (unchanged — stays `Open`) | — |
 | Phase 1 approved | `Open` → `In Progress` | `[x] UNDERSTAND — approved [timestamp]` |
 | Phase 2 approved | (unchanged) | `[x] PLAN — approved [timestamp]` |
 | Phase 2 skipped | (unchanged) | `[x] PLAN — skipped (simple scope)` |
