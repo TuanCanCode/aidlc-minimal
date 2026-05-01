@@ -14,11 +14,13 @@ New request → Create TASK-NNN → Review Gate → UNDERSTAND → PLAN → BUIL
 
 ## Step 1: Initialise Task (run BEFORE Phase 1)
 
-### 1.0 Load reverse engineering artifact (brownfield only)
+### 1.0 Pre-load reverse engineering artifacts (brownfield only)
+
+> **Note**: This step only **loads** existing artifacts. The decision to **run** or **re-run** reverse engineering is made in `understand.md` Step 2 — not here.
 
 Before creating the task, check `aidlc-docs/reverse-engineering/timestamp.md`:
-- **Exists and current** (artifact newer than `git log -1` timestamp) → load all files in `aidlc-docs/reverse-engineering/` into context immediately — Phase 1 UNDERSTAND will skip the re-scan and skip the approval gate
-- **Exists but stale / not exists** → Phase 1 UNDERSTAND will run the full reverse engineering scan, generate all files, and present the approval gate
+- **Exists and current** (artifact newer than `git log -1` timestamp) → load all files in `aidlc-docs/reverse-engineering/` into context immediately — this gives the AI codebase knowledge before the task even starts
+- **Exists but stale / not exists** → do NOT load stale artifacts; Phase 1 UNDERSTAND will run the full reverse engineering scan (MANDATORY — see understand.md Step 2)
 - **Greenfield** → skip this step
 
 This ensures every task starts with codebase knowledge already loaded, not re-read.

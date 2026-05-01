@@ -10,7 +10,7 @@
 > Phase 1 always runs for every new task — do NOT re-check `state.md` or redirect to session-continuity here.
 
 Scan workspace for source code (`.java`, `.ts`, `.py`, `.go`, `.kt`, etc.) and build files (`package.json`, `pom.xml`, `build.gradle`, etc.):
-- **Has code** → `brownfield = true`, proceed to Step 2
+- **Has code** → `brownfield = true`, **MUST proceed to Step 2 (Reverse Engineering)**
 - **No code** → `brownfield = false`, skip to Step 3
 
 If `aidlc-docs/state.md` does not exist yet, create it now (see session-continuity.md for format).
@@ -23,7 +23,9 @@ Log to `aidlc-docs/audit.md`:
 
 ---
 
-## Step 2: Reverse Engineering (brownfield only)
+## Step 2: Reverse Engineering (MANDATORY for brownfield)
+
+> **CRITICAL**: This step MUST execute for every brownfield project. On the first task for a brownfield project, this is the most important step in the entire workflow — it builds the codebase knowledge that all future tasks rely on. **NEVER skip this step** when `brownfield = true`.
 
 ### 2.1 Check for existing artifacts
 
@@ -32,10 +34,10 @@ Check `aidlc-docs/reverse-engineering/timestamp.md`:
 **If exists** → read `Analysis Date` from it:
 - Run `git log -1 --format=%cI -- .` to get last commit timestamp
 - **Artifact is newer than last commit** → load all files in `aidlc-docs/reverse-engineering/` into context, **skip to Step 3** (no approval needed, auto-proceed)
-- **Artifact is older than last commit** → codebase changed, re-run reverse engineering below
+- **Artifact is older than last commit** → codebase changed, **MUST re-run** reverse engineering below
 - **User explicitly requests rerun** → re-run regardless
 
-**If not exists** → run full reverse engineering below.
+**If not exists** → **MUST run full reverse engineering below. Do NOT skip.**
 
 ---
 
@@ -86,7 +88,7 @@ Check `aidlc-docs/reverse-engineering/timestamp.md`:
 
 ### 2.3 Generate artifact files
 
-Create all files below inside `aidlc-docs/reverse-engineering/`. Output all files before presenting the approval message.
+Write all files below to disk inside `aidlc-docs/reverse-engineering/` using file-write tools. **Do NOT output file content to chat** — writing to disk is the only output. All files must be saved before presenting the approval message.
 
 #### File 1: `business-overview.md`
 ```markdown

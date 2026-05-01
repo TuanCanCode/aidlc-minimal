@@ -26,10 +26,10 @@ Read task registry → assign next `TASK-NNN` → check RE artifact → create t
 See `task-management.md` for full rules.
 
 ### Phase 1 — UNDERSTAND (always)
-Workspace scan → Reverse Engineering (brownfield only, auto) → Requirements gathering
+Workspace scan → **Reverse Engineering (MANDATORY for brownfield)** → Requirements gathering
 
 **IMPORTANT**: Phase 1 does NOT check `state.md` again. Session routing already happened in Step 0.
-Phase 1 always runs workspace scan and RE check for every new task.
+**MANDATORY**: On brownfield projects, Reverse Engineering MUST run. If `aidlc-docs/reverse-engineering/` artifacts do not exist, the AI MUST perform the full codebase scan and generate all RE artifacts before proceeding to requirements. If artifacts exist and are current, load them from files (no re-scan needed).
 
 **Gate**: Present understanding summary → wait for user approval
 
