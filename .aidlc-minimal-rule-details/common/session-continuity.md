@@ -7,12 +7,25 @@ This check runs ONCE in CLAUDE.md Step 0 — never inside Phase 1, 2, or 3.
 Read `aidlc-docs/state.md`:
 
 **Case 1 — state.md does not exist**:
-New project. Proceed directly to Task Init (task-management.md Step 1).
+New project. CLAUDE.md Step 0 handles this — scan workspace for code to determine whether PROJECT INIT runs.
 
-**Case 2 — state.md exists, Phase is `COMPLETE`**:
-Previous task finished. Proceed directly to Task Init for the new task.
+**Case 2 — state.md exists, Phase is `INIT`**:
+PROJECT INIT was started but not completed (e.g. session ended before folder structure was confirmed). Resume by presenting:
 
-**Case 3 — state.md exists, Phase is `UNDERSTAND` / `PLAN` / `BUILD`**:
+```
+## Resuming Project Init
+
+It looks like workspace structure setup was not finished.
+
+What folder layout would you like? (e.g. `frontend/` + `backend/`, backend only, etc.)
+```
+
+Then continue from `init.md` Step 3 (propose layout and create folders).
+
+**Case 3 — state.md exists, Phase is `COMPLETE`**:
+Previous task finished (or init completed). Proceed directly to Task Init for the new task.
+
+**Case 4 — state.md exists, Phase is `UNDERSTAND` / `PLAN` / `BUILD`**:
 There is an in-progress task. Read `aidlc-docs/tasks/registry.md` to find the `In Progress` task, then present:
 
 ```
@@ -49,8 +62,14 @@ Keep `aidlc-docs/state.md` minimal:
 # State
 - Project: [Greenfield / Brownfield]
 - Started: [ISO timestamp]
-- Phase: [UNDERSTAND / PLAN / BUILD / COMPLETE]
+- Phase: [INIT / UNDERSTAND / PLAN / BUILD / COMPLETE]
 - Workspace: [absolute path to workspace root]
+- Structure: [comma-separated root folders — set by Phase 0, e.g. "frontend, backend"; omit for brownfield]
 ```
+
+`Phase` values:
+- `INIT` — PROJECT INIT in progress (greenfield only)
+- `UNDERSTAND / PLAN / BUILD` — active task phase
+- `COMPLETE` — no task in progress (includes post-init, post-task completion)
 
 Update `Phase` field when advancing between phases.

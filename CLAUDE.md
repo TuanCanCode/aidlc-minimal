@@ -4,6 +4,7 @@
 Load these at the start of EVERY software development request:
 - `.aidlc-minimal-rule-details/common/task-management.md`
 - `.aidlc-minimal-rule-details/common/session-continuity.md`
+- `.aidlc-minimal-rule-details/phases/init.md`
 - `.aidlc-minimal-rule-details/phases/understand.md`
 - `.aidlc-minimal-rule-details/phases/plan.md`
 - `.aidlc-minimal-rule-details/phases/build.md`
@@ -15,9 +16,19 @@ Load these at the start of EVERY software development request:
 
 ### Step 0 — SESSION CHECK (always first)
 Check `aidlc-docs/state.md`:
-- **Not exists** → new project, proceed to Step 1
-- **Exists, phase is COMPLETE or no in-progress task** → existing project, new task → proceed to Step 1
+- **Not exists** → scan workspace for source code:
+  - **No source code found (empty workspace)** → run **Phase 0: PROJECT INIT** before anything else
+  - **Source code found (brownfield)** → proceed to Step 1
+- **Exists, phase is `INIT`** → init was interrupted → follow `session-continuity.md` to resume
+- **Exists, phase is `COMPLETE`** → existing project, new task → proceed to Step 1
 - **Exists, in-progress task found** → follow `session-continuity.md` to resume
+
+### Phase 0 — PROJECT INIT (greenfield only, runs once)
+Ask user to define workspace folder layout (frontend/backend/etc.) → propose structure → create folders with `.gitkeep` → save to `state.md`.
+
+See `init.md` for full rules.
+
+**No approval gate** — user's first task request is the implicit signal to proceed to Step 1.
 
 ### Step 1 — TASK INIT
 Read task registry → assign next `TASK-NNN` → check RE artifact → create task file → present task summary for review.
