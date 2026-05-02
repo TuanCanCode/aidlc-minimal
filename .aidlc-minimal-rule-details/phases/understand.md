@@ -380,7 +380,10 @@ Ready to proceed?
 Wait for explicit user confirmation before advancing to Phase 2 (or Phase 3 if Phase 2 is skipped).
 
 Update `aidlc-docs/state.md` Phase field to `PLAN` (or `BUILD` if skipping).
-Update `aidlc-docs/tasks/TASK-NNN.md`: mark `[x] UNDERSTAND — approved [timestamp]`, set Status to `In Progress`.
+Update `aidlc-docs/tasks/TASK-NNN.md`:
+- Mark `[x] UNDERSTAND — approved [timestamp]`
+- If Phase 2 is skipped: also mark `[x] PLAN — skipped (simple scope)`
+- Set Status to `In Progress`
 Update registry row status to `In Progress`.
 Log to `aidlc-docs/audit.md`:
 ```

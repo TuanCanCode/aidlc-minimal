@@ -273,10 +273,9 @@ Proceed to `document.md` (Phase 4: DOCUMENT).
 
 ### If user chooses B — Skip
 
-Record in `aidlc-docs/tasks/TASK-NNN.md`:
-```
-**Docs**: Skipped
-```
+Update `aidlc-docs/tasks/TASK-NNN.md`:
+- Mark `[-] DOCUMENT — skipped` in the `## Phases` checklist
+- Set `**Docs**: Skipped`
 
 ---
 
