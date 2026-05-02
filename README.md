@@ -123,6 +123,7 @@ PROJECT INIT ───────── (greenfield only, runs once)
     │
     ▼
 TASK INIT ──────────── Creates TASK-NNN, updates registry
+    │                  ⛔ Gate: user reviews task file before proceeding
     │
     ▼
 UNDERSTAND ─────────── Scans workspace, gathers requirements

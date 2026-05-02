@@ -33,7 +33,7 @@ See `init.md` for full rules.
 ### Step 1 — TASK INIT
 Read task registry → assign next `TASK-NNN` → check RE artifact → create task file → present task summary for review.
 
-**Gate**: Present task summary with initial assessment → user confirms, adds context, or corrects → then proceed to Phase 1.
+**Gate**: Present task summary with initial assessment + path to task file → user reviews task file, then confirms, adds context, or corrects → then proceed to Phase 1.
 See `task-management.md` for full rules.
 
 ### Phase 1 — UNDERSTAND (always)

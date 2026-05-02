@@ -120,7 +120,9 @@ Present the task summary and wait for user confirmation before proceeding:
 - [bullet 2 — if applicable]
 - [bullet 3 — if applicable]
 
-Please review:
+Task file written to: `aidlc-docs/tasks/TASK-NNN.md`
+
+Please review the task file, then:
 - **Confirm** → proceed to UNDERSTAND phase
 - **Add context** → provide additional details, constraints, or references before I proceed
 - **Correct** → clarify if I misunderstood something
