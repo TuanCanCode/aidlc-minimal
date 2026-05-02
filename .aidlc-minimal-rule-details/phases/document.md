@@ -496,9 +496,8 @@ Please review. Request changes or approve to complete.
 ```
 
 After approval, update `aidlc-docs/tasks/TASK-NNN.md`:
-```
-**Docs**: Generated — [list of created/updated doc files]
-```
+- Mark `[x] DOCUMENT — approved [timestamp]` in the `## Phases` checklist
+- Set `**Docs**: Generated — [list of created/updated doc files]`
 
 Log to `aidlc-docs/audit.md`:
 ```

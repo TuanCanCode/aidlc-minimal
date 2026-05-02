@@ -295,7 +295,9 @@ When only one track is detected (Step 1):
 - Skip Step 2 (track selection)
 - Run Steps 3–4 once (no track label needed in the code plan)
 - Skip Step 5 (per-track gate) — proceed directly to Step 6 (Testing)
-- The Phase 3 Gate (final approval) is the only approval needed
+- **Step 6 (Testing) MUST still run** — present the A/B prompt and wait for user response before continuing
+- Step 7 (Build instructions) runs as normal (auto, no approval)
+- Phase 3 Gate is the only approval gate for the whole task
 
 This keeps the workflow lean for backend-only or frontend-only tasks.
 

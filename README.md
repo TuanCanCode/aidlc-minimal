@@ -8,12 +8,13 @@ A lightweight AI-assisted software development workflow for Claude Code. Streaml
 
 Every time you ask Claude to implement something, it automatically:
 
-1. **Creates a task ticket** (`TASK-001`, `TASK-002`, ...) to track the request
-2. **Understands** your codebase and requirements before writing a line of code
-3. **Plans** the approach for non-trivial work (skips this for simple tasks)
-4. **Builds** the code, tests, and build instructions
-5. **Documents** what was built under `docs/` — optional, user-triggered after BUILD
-6. **Records** all key decisions in a traceable log
+1. **Initialises** a folder structure for brand-new empty projects (frontend/backend/etc.) — runs once, skipped for existing codebases
+2. **Creates a task ticket** (`TASK-001`, `TASK-002`, ...) to track the request
+3. **Understands** your codebase and requirements before writing a line of code
+4. **Plans** the approach for non-trivial work (skips this for simple tasks)
+5. **Builds** the code, tests, and build instructions
+6. **Documents** what was built under `docs/` — optional, user-triggered after BUILD
+7. **Records** all key decisions in a traceable log
 
 ---
 
@@ -32,9 +33,11 @@ your-project/
     │   ├── task-management.md
     │   └── session-continuity.md
     └── phases/
+        ├── init.md
         ├── understand.md
         ├── plan.md
-        └── build.md
+        ├── build.md
+        └── document.md
 ```
 
 **Option B: `.claude` folder**
@@ -47,9 +50,11 @@ your-project/
         │   ├── task-management.md
         │   └── session-continuity.md
         └── phases/
+            ├── init.md
             ├── understand.md
             ├── plan.md
-            └── build.md
+            ├── build.md
+            └── document.md
 ```
 
 ### Step 2 — Open project in Claude Code
@@ -110,6 +115,11 @@ Claude pauses at the end of each phase with a summary. Reply to continue:
 
 ```
 New Request
+    │
+    ▼
+PROJECT INIT ───────── (greenfield only, runs once)
+    │                  Ask for folder layout → create frontend/, backend/, etc.
+    │                  Skipped if workspace already has code
     │
     ▼
 TASK INIT ──────────── Creates TASK-NNN, updates registry
@@ -251,7 +261,7 @@ Continue TASK-003, or create a new task for a fresh request?
 | | Full AIDLC | AIDLC Minimal |
 |---|---|---|
 | Approval gates | 13+ | **4** (UNDERSTAND + PLAN + BUILD + DOCUMENT) |
-| Rule files | 28 | **7** |
+| Rule files | 28 | **8** |
 | Docs per project | 20+ | **2–8** |
 | Q&A format | `[Answer]:` in file | `[Answer]:` in file |
 | Decision log | Per-interaction audit | **Key decisions only** |
