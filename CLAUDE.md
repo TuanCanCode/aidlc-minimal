@@ -4,6 +4,7 @@
 Load these at the start of EVERY software development request:
 - `.aidlc-minimal-rule-details/common/task-management.md`
 - `.aidlc-minimal-rule-details/common/session-continuity.md`
+- `.aidlc-minimal-rule-details/phases/ideate.md`
 - `.aidlc-minimal-rule-details/phases/init.md`
 - `.aidlc-minimal-rule-details/phases/understand.md`
 - `.aidlc-minimal-rule-details/phases/plan.md`
@@ -13,6 +14,16 @@ Load these at the start of EVERY software development request:
 ---
 
 ## Workflow
+
+### Idea Capture — STANDALONE (runs independently, any time)
+Triggered by: `"capture idea: [title]"` / `"new idea"` / `"idea: [title]"`
+
+Generate an idea file in `aidlc-docs/ideas/` → present the file path → stop. No AIDLC workflow runs.
+When ready: `"promote IDEA-NNN"` converts the idea into a TASK and starts the workflow at Step 1.
+
+See `ideate.md` for full rules.
+
+---
 
 ### Step 0 — SESSION CHECK (always first)
 Check `aidlc-docs/state.md`:
@@ -31,9 +42,9 @@ See `init.md` for full rules.
 **No approval gate** — user's first task request is the implicit signal to proceed to Step 1.
 
 ### Step 1 — TASK INIT
-Read task registry → assign next `TASK-NNN` → check RE artifact → create task file → present task summary for review.
+Ask for task prefix (Jira ID or auto-assign) → read task registry → create task file with Requirements template → present task summary for review.
 
-**Gate**: Present task summary with initial assessment + path to task file → user reviews task file, then confirms, adds context, or corrects → then proceed to Phase 1.
+**Gate**: Present task summary → user opens task file, fills `## Requirements`, then confirms, adds context, or corrects → then proceed to Phase 1.
 See `task-management.md` for full rules.
 
 ### Phase 1 — UNDERSTAND (always)
@@ -63,7 +74,7 @@ Detect implementation tracks (Backend / Frontend / Mobile) → user chooses orde
 Ask user whether to write/update docs → init `docs/` scaffold if missing → load defined sources → map deliverables to doc targets → write under `docs/`
 
 **Gate**: Present doc summary → wait for user approval
-**Skip**: User declines, or user runs `"document TASK-NNN"` retroactively
+**Skip**: User declines, or user runs `"document TASK-ID"` retroactively
 
 ---
 
@@ -83,7 +94,7 @@ Testing is **optional**. After code generation, the agent asks the user:
 - No → skip, record `Tests: Skipped` in the task file
 
 **Retroactive test generation**: User can request tests for any completed task at any time:
-> "generate tests for TASK-NNN"
+> "generate tests for TASK-ID"
 
 The agent reads the task's Deliverables, loads the source files, and generates tests.
 See `phases/build.md` — "Retroactive Test Generation" section for full rules.
@@ -106,8 +117,13 @@ Events: `start`, `task-confirmed`, `requirements-approved`, `plan-approved`, `co
 aidlc-docs/
   state.md              # workspace info + current phase
   audit.md              # key approval events (timestamps)
-  decisions.md          # Q&A snapshots tagged by task number
-  reverse-engineering/    # brownfield only — written once, reused across all tasks
+  decisions.md          # Q&A snapshots tagged by task ID
+  ideas/                # standalone idea backlog — not part of AIDLC workflow
+    registry.md         # index of all ideas + status
+    IDEA-001.md         # individual idea files (user fills in)
+    IDEA-002.md
+    ...
+  reverse-engineering/  # brownfield only — written once, reused across all tasks
     business-overview.md
     architecture.md
     code-structure.md
@@ -122,7 +138,7 @@ aidlc-docs/
   tasks/
     registry.md         # task counter + status list
     TASK-001.md         # individual task files (one per request)
-    TASK-002.md
+    PROJ-123.md         # user-supplied prefix example
     ...
 ```
 **Application code**: workspace root only — NEVER inside `aidlc-docs/`
