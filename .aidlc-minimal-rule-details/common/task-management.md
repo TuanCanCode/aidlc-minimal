@@ -1,13 +1,13 @@
 # Task Management
 
-**Purpose**: Every new implementation request gets a unique task number (like a Jira ticket) that increments automatically. The AI reads and updates the task file throughout the workflow.
+**Purpose**: Every new implementation request gets a unique task ID (auto-generated or user-supplied, e.g. a Jira ticket number). The AI reads and updates the task file throughout the workflow.
 
 ---
 
 ## Task Lifecycle
 
 ```
-New request → Create TASK-NNN → Review Gate → UNDERSTAND → PLAN → BUILD → Complete
+New request → Ask for prefix → Create TASK-ID → Fill Requirements → Review Gate → UNDERSTAND → PLAN → BUILD → Complete
 ```
 
 ---
@@ -25,11 +25,31 @@ Before creating the task, check `aidlc-docs/reverse-engineering/timestamp.md`:
 
 This ensures every task starts with codebase knowledge already loaded, not re-read.
 
-### 1.1 Read or create the registry
+### 1.1 Ask for task prefix
+
+Before reading the registry, ask the user:
+
+```
+Do you have an external ticket number for this task (e.g. a Jira ID like "PROJ-123")?
+- Provide it → used as the task ID exactly as typed
+- Skip / press Enter → auto-assign the next TASK-NNN
+```
+
+**Rules**:
+- Accept any alphanumeric string with an optional hyphen separator (e.g. `PROJ-123`, `BE-42`, `FE-7`).
+- Do NOT normalise or reformat the user-supplied prefix — use it verbatim.
+- If the user skips (blank, "no", "skip", "n"), fall through to 1.2 to auto-assign.
+- If the supplied ID already exists as a file in `aidlc-docs/tasks/`, warn the user and ask for a different one.
+
+### 1.2 Read or create the registry
 
 Check `aidlc-docs/tasks/registry.md`:
-- **Exists** → read `Next Task` number from it
+- **Exists** → read `Next Task` number from it (used only when auto-assigning)
 - **Not exists** → create it with `Next Task: TASK-001`
+
+Determine final task ID:
+- **User supplied a prefix** → use that string as `TASK-ID` (e.g. `PROJ-123`)
+- **Auto-assign** → use `TASK-NNN` from registry (e.g. `TASK-001`), then increment `Next Task`
 
 Registry format:
 ```markdown
@@ -41,12 +61,14 @@ Registry format:
 |---|---|---|---|
 ```
 
-### 1.2 Create the task file
+> `Next Task` only increments when auto-assigning. User-supplied IDs do not affect the counter.
 
-Create `aidlc-docs/tasks/TASK-NNN.md`:
+### 1.3 Create the task file
+
+Create `aidlc-docs/tasks/TASK-ID.md` (substituting the actual ID):
 
 ```markdown
-# TASK-NNN: [Short title derived from user request]
+# TASK-ID: [Short title derived from user request]
 
 **Status**: Open
 **Created**: [ISO timestamp]
@@ -55,6 +77,18 @@ Create `aidlc-docs/tasks/TASK-NNN.md`:
 
 ## Request
 [Original user request — verbatim, never summarised]
+
+## Requirements
+> Fill in this section before confirming. Add acceptance criteria, constraints, and any details not captured in the Request above. Delete placeholder lines that do not apply.
+
+### Acceptance Criteria
+- [ ] 
+
+### Constraints / Notes
+- 
+
+### Out of Scope
+- 
 
 ## Phases
 - [ ] UNDERSTAND
@@ -89,23 +123,23 @@ Create `aidlc-docs/tasks/TASK-NNN.md`:
 `**Docs**` field values:
 - `Pending` — build not yet complete
 - `Generated — [list of doc files]` — docs written after BUILD
-- `Skipped` — user opted out (retroactive generation available via `"document TASK-NNN"`)
+- `Skipped` — user opted out (retroactive generation available via `"document TASK-ID"`)
 - `Generated (retroactive) — [list of doc files]` — docs written after task completed
 
-### 1.3 Update the registry
+### 1.4 Update the registry
 
-Append a row to the registry table and increment `Next Task`:
+Append a row to the registry table:
 
 ```markdown
-| TASK-NNN | [Short title] | Open | [ISO timestamp] |
+| TASK-ID | [Short title] | Open | [ISO timestamp] |
 ```
 
-### 1.4 Present task for review (GATE)
+### 1.5 Present task for review (GATE)
 
-Present the task summary and wait for user confirmation before proceeding:
+Present the task summary and explicitly ask the user to fill in the Requirements section:
 
 ```
-## Task Created: TASK-NNN — [Short title]
+## Task Created: TASK-ID — [Short title]
 
 **Request**:
 > [Original user request — verbatim]
@@ -120,31 +154,37 @@ Present the task summary and wait for user confirmation before proceeding:
 - [bullet 2 — if applicable]
 - [bullet 3 — if applicable]
 
-Task file written to: `aidlc-docs/tasks/TASK-NNN.md`
+Task file written to: `aidlc-docs/tasks/TASK-ID.md`
 
-Please review the task file, then:
-- **Confirm** → proceed to UNDERSTAND phase
-- **Add context** → provide additional details, constraints, or references before I proceed
-- **Correct** → clarify if I misunderstood something
+**Next step — fill in the Requirements section**:
+Open the task file and complete the `## Requirements` section:
+- **Acceptance Criteria** — what must be true for this task to be done?
+- **Constraints / Notes** — tech choices, deadlines, team conventions, links to designs
+- **Out of Scope** — explicitly exclude anything that could be mistakenly assumed in scope
+
+When done, reply with one of:
+- **Confirm** → proceed to UNDERSTAND phase (uses requirements as-is)
+- **Add context** → paste additional details here and I will append them to the file
+- **Correct** → clarify if I misunderstood the request
 ```
 
 **Wait for explicit user response** before proceeding to Phase 1.
 
 **User responses**:
-- User confirms (e.g. "ok", "proceed", "looks good") → proceed to Phase 1
-- User provides additional context → append the new context to the `## Request` section in the task file, update the assessment if needed, then proceed to Phase 1
+- User confirms (e.g. "ok", "proceed", "looks good") → read the task file to pick up any edits the user made to `## Requirements`, then proceed to Phase 1
+- User pastes additional context → append it to the `## Requirements` section in the task file, update the assessment if needed, then proceed to Phase 1
 - User corrects the understanding → update the task file title / request / assessment, re-present the summary for confirmation
 
 Log to `aidlc-docs/audit.md`:
 ```
-[timestamp] TASK-NNN INIT confirmed: [type], [scope]
+[timestamp] TASK-ID INIT confirmed: [type], [scope]
 ```
 
 ---
 
 ## Step 2: Update Task During Workflow
 
-Update `aidlc-docs/tasks/TASK-NNN.md` at each phase gate:
+Update `aidlc-docs/tasks/TASK-ID.md` at each phase gate:
 
 | Event | Status change | Phase / Track checkbox |
 |---|---|---|
@@ -184,17 +224,25 @@ For single-track tasks, omit the track headers — list deliverables flat.
 
 ---
 
-## Task Number Format
+## Task ID Format
 
-- Format: `TASK-NNN` (zero-padded to 3 digits)
-- Sequence: TASK-001, TASK-002, ... TASK-099, TASK-100, ...
-- Never reuse or skip numbers
+Two valid forms:
+
+| Source | Format | Example |
+|---|---|---|
+| User-supplied | Any alphanumeric string, optional hyphen separator | `PROJ-123`, `BE-42`, `FE-7` |
+| Auto-assigned | `TASK-NNN` — zero-padded to 3 digits | `TASK-001`, `TASK-042` |
+
+- Auto-assigned sequence: TASK-001, TASK-002, … TASK-099, TASK-100, …
+- Never reuse or skip auto-assigned numbers
+- User-supplied IDs are used verbatim — never normalised or reformatted
+- User-supplied IDs do not affect the auto-assign counter
 
 ---
 
 ## Decisions Tagging
 
-When writing to `aidlc-docs/decisions.md`, prefix each section header with the task number:
+When writing to `aidlc-docs/decisions.md`, prefix each section header with the task ID:
 
 ```markdown
 ## TASK-001 | UNDERSTAND — [ISO timestamp]
@@ -204,7 +252,7 @@ When writing to `aidlc-docs/decisions.md`, prefix each section header with the t
 ...
 ```
 
-This makes decisions traceable back to the task that produced them.
+Use the actual task ID (e.g. `PROJ-123`) in place of `TASK-001`. This makes decisions traceable back to the task that produced them.
 
 ---
 
@@ -214,3 +262,5 @@ When `aidlc-docs/state.md` shows `Phase: BUILD` (or any in-progress phase):
 1. Read registry to find the `In Progress` task
 2. Load that task file
 3. Resume from the last unchecked phase checkbox
+
+> The task file name matches the task ID exactly (e.g. `aidlc-docs/tasks/PROJ-123.md` or `aidlc-docs/tasks/TASK-001.md`).
