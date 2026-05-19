@@ -5,6 +5,7 @@ Load these at the start of EVERY software development request:
 - `.aidlc-minimal-rule-details/common/task-management.md`
 - `.aidlc-minimal-rule-details/common/session-continuity.md`
 - `.aidlc-minimal-rule-details/phases/ideate.md`
+- `.aidlc-minimal-rule-details/phases/backlog.md`
 - `.aidlc-minimal-rule-details/phases/init.md`
 - `.aidlc-minimal-rule-details/phases/understand.md`
 - `.aidlc-minimal-rule-details/phases/plan.md`
@@ -15,13 +16,18 @@ Load these at the start of EVERY software development request:
 
 ## Workflow
 
-### Idea Capture — STANDALONE (runs independently, any time)
+### Idea Capture & Backlog — STANDALONE (runs independently, any time)
 Triggered by: `"capture idea: [title]"` / `"new idea"` / `"idea: [title]"`
 
 Generate an idea file in `aidlc-docs/ideas/` → present the file path → stop. No AIDLC workflow runs.
-When ready: `"promote IDEA-NNN"` converts the idea into a TASK and starts the workflow at Step 1.
 
-See `ideate.md` for full rules.
+After capture, two paths:
+- **Small idea** → `"promote IDEA-NNN"` — converts directly into a TASK, starts the workflow at Step 1
+- **Larger idea** → `"backlog IDEA-NNN"` — AI reads the idea and generates a checklist of high-level implementation items in `aidlc-docs/backlog/IDEA-NNN.md`; then create tasks one by one with `"task IDEA-NNN [item number or description]"`
+
+Backlog commands: `"list backlog"` · `"show backlog IDEA-NNN"` · `"task IDEA-NNN [item]"`
+
+See `ideate.md` and `backlog.md` for full rules.
 
 ---
 
@@ -118,10 +124,14 @@ aidlc-docs/
   state.md              # workspace info + current phase
   audit.md              # key approval events (timestamps)
   decisions.md          # Q&A snapshots tagged by task ID
-  ideas/                # standalone idea backlog — not part of AIDLC workflow
+  ideas/                # standalone idea space — not part of AIDLC workflow
     registry.md         # index of all ideas + status
     IDEA-001.md         # individual idea files (user fills in)
     IDEA-002.md
+    ...
+  backlog/              # per-idea implementation breakdowns
+    IDEA-001.md         # checklist of implementation items for IDEA-001
+    IDEA-002.md         # one file per idea that has been broken down
     ...
   reverse-engineering/  # brownfield only — written once, reused across all tasks
     business-overview.md

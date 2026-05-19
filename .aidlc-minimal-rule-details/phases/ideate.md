@@ -14,6 +14,11 @@ Run this phase when the user says any of:
 
 Do NOT run the normal AIDLC workflow (Step 0 session check, Task Init, phases) when this trigger is detected. This phase is fully standalone.
 
+**After capture**, the user has three paths:
+- `"promote IDEA-NNN"` → direct to task (small idea, starts AIDLC workflow immediately)
+- `"backlog IDEA-NNN"` → AI breaks the idea into implementation items; create tasks one by one from that list
+- Leave it as-is → stays in the idea space for further refinement
+
 ---
 
 ## Step 1: Ensure Ideas Folder Exists
@@ -120,8 +125,10 @@ Open the file and fill in the sections at your own pace:
 - **References** — links, designs, related context
 
 No further action needed. Come back when ready and say:
-> `"promote IDEA-NNN"` — converts it into a formal TASK and starts the AIDLC workflow.
-> `"list ideas"` — shows the full idea backlog by status.
+> `"promote IDEA-NNN"` — for small ideas: converts directly into a TASK and starts the AIDLC workflow.
+> `"backlog IDEA-NNN"` — for larger ideas: AI breaks it into implementation items; then create tasks one by one.
+> `"list ideas"` — shows the full idea list by status.
+> `"list backlog"` — shows all idea breakdowns with progress.
 ```
 
 **Stop here.** Do NOT proceed to UNDERSTAND / PLAN / BUILD.
@@ -135,11 +142,22 @@ No further action needed. Come back when ready and say:
 | `Raw` | Just captured — sections not yet filled in |
 | `Refined` | Key sections filled, open questions being resolved |
 | `Ready` | Acceptance criteria clear enough to plan — waiting for promotion |
-| `Promoted` | Converted to a TASK (links to task ID in Status Log) |
+| `Promoted` | Converted to a TASK directly (links to task ID in Status Log) |
+| `Backlogged` | Broken down into implementation items in `aidlc-docs/backlog/IDEA-NNN.md` |
 | `Parked` | On hold — not being actively developed |
 | `Dropped` | Decided not to pursue |
 
-The user updates `**Status**` in the idea file manually. The AI only updates it during promotion (to `Promoted`).
+The user updates `**Status**` in the idea file manually. The AI only updates it during promotion (to `Promoted`) or when generating a backlog (to `Backlogged`).
+
+---
+
+## Breaking an Idea into a Backlog
+
+When the user says `"backlog IDEA-NNN"`:
+
+See `backlog.md` — "Generating a Backlog" section for full rules.
+
+The short version: read the idea, generate a checklist of high-level implementation items, save it to `aidlc-docs/backlog/IDEA-NNN.md`, present it for review. Set the idea status to `Backlogged`. **Do not** start the AIDLC workflow.
 
 ---
 

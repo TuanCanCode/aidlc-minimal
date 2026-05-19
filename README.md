@@ -8,7 +8,7 @@ A lightweight AI-assisted software development workflow for Claude Code. Streaml
 
 Every time you ask Claude to implement something, it automatically:
 
-1. **Captures ideas** in a standalone backlog before they become tasks (optional)
+1. **Captures ideas** in a freeform space, queues them in a structured backlog, and promotes them to tasks when ready
 2. **Initialises** a folder structure for brand-new empty projects — runs once, skipped for existing codebases
 3. **Creates a task ticket** with a custom ID (Jira number) or auto-assigned `TASK-NNN`
 4. **Understands** your codebase and requirements before writing a line of code
@@ -34,6 +34,7 @@ your-project/
     │   └── session-continuity.md
     └── phases/
         ├── ideate.md
+        ├── backlog.md
         ├── init.md
         ├── understand.md
         ├── plan.md
@@ -52,6 +53,7 @@ your-project/
         │   └── session-continuity.md
         └── phases/
             ├── ideate.md
+            ├── backlog.md
             ├── init.md
             ├── understand.md
             ├── plan.md
@@ -72,16 +74,52 @@ That's it. Claude reads `CLAUDE.md` automatically on startup.
 Park rough ideas without triggering the full workflow:
 
 ```
-capture idea: smarter search with semantic ranking
+capture idea: real-time notification system
 ```
 
-Claude creates `aidlc-docs/ideas/IDEA-001.md` with a template and stops. Fill it in at your own pace. When it's ready:
+Claude creates `aidlc-docs/ideas/IDEA-001.md` with a template and stops. Use the idea file as a collaborative space — work with Claude to flesh out the problem, motivation, and rough solution at your own pace.
 
+When ready, choose one of two paths:
+
+**Small idea — promote directly to a task**
 ```
 promote IDEA-001
 ```
-
 Claude reads the idea file, pre-populates a task from it, then starts the normal workflow.
+
+**Larger idea — break it into a backlog first**
+```
+backlog IDEA-001
+```
+Claude reads the idea and generates a checklist of high-level implementation items in `aidlc-docs/backlog/IDEA-001.md`. You review and confirm the breakdown. Then create tasks one by one from that list:
+
+```
+task IDEA-001 3
+```
+or
+```
+task IDEA-001 Build the notification service
+```
+
+Claude creates a task pre-filled from the backlog item, ticks it off the checklist, and starts the AIDLC workflow.
+
+### Manage the backlog
+
+View all breakdowns and their progress:
+```
+list backlog
+```
+
+Show the checklist for a specific idea:
+```
+show backlog IDEA-001
+```
+
+Pick the next item to work on:
+```
+task IDEA-001
+```
+Claude lists all unchecked items and asks which one to turn into a task.
 
 ### Start a new task
 
@@ -141,9 +179,21 @@ Claude pauses at the end of each phase. Reply to continue:
 "capture idea: …"  ──────────────────────────────────────────────────────┐
                                                                           │
                                                               IDEA CAPTURE (standalone)
-                                                              Creates IDEA-NNN.md
-                                                              User fills template at own pace
-                                                              "promote IDEA-NNN" → TASK INIT
+                                                              Work with Claude to flesh out
+                                                              the feature vision
+                                                                          │
+                              ┌───────────────────────────────────────────┤
+                              │                                           │
+                   [larger idea]                                 [small idea]
+                "backlog IDEA-NNN"                          "promote IDEA-NNN"
+                              │                                           │
+                    BACKLOG (standalone)                                  │
+                    AI generates breakdown:                               │
+                    - [ ] Build X                                         │
+                    - [ ] Build Y                                         │
+                    - [ ] Build Z                                         │
+                              │                                           │
+               "task IDEA-NNN [item]"  ────────────────────────────────── │
                                                                           │
 New Request ──────────────────────────────────────────────────────────────┘
     │
@@ -208,10 +258,29 @@ COMPLETE ───────────── Task marked done in registry
 | Trigger phrases | `"capture idea: [title]"`, `"new idea"`, `"idea: [title]"` |
 | Idea template | Problem Statement, Motivation, Rough Solution, Open Questions, Rough Acceptance, References |
 | Auto ID assignment | `IDEA-NNN` (zero-padded, never reused) |
-| Status lifecycle | `Raw` → `Refined` → `Ready` → `Promoted` / `Parked` / `Dropped` |
-| Promotion | `"promote IDEA-NNN"` — pre-populates a task file from idea content, then starts TASK INIT |
-| List backlog | `"list ideas"` — shows all ideas grouped by status |
+| Status lifecycle | `Raw` → `Refined` → `Ready` → `Promoted` / `Backlogged` / `Parked` / `Dropped` |
+| Promote to task | `"promote IDEA-NNN"` — pre-populates a task file from idea content, then starts TASK INIT |
+| Move to backlog | `"backlog IDEA-NNN"` — creates a BACKLOG-NNN item from the idea; sets idea status to `Backlogged` |
+| List ideas | `"list ideas"` — shows all ideas grouped by status |
 | Folder organization | Flat `aidlc-docs/ideas/` by default; sub-folders on request |
+
+---
+
+### Backlog Management (`backlog.md`)
+
+| Guideline | Detail |
+|---|---|
+| Standalone phase | Runs independently — only `"task IDEA-NNN …"` continues into the AIDLC workflow |
+| Purpose | Break a larger idea into a trackable checklist of high-level implementation items |
+| AI-generated | `"backlog IDEA-NNN"` — Claude reads the idea and generates the item list; user reviews and confirms |
+| Per-idea file | One file per broken-down idea at `aidlc-docs/backlog/IDEA-NNN.md`; no separate IDs |
+| Item format | Checklist: `- [ ] Build X`, ticked off as `- [x] Build X → TASK-001` when a task is created |
+| Create task from item | `"task IDEA-NNN 3"` or `"task IDEA-NNN Build X"` — creates a task pre-filled from the item + idea context |
+| Pick next item | `"task IDEA-NNN"` (no item specified) — Claude lists all unchecked items and asks which one |
+| List all backlogs | `"list backlog"` — shows all ideas with breakdowns and per-idea progress (N / M items) |
+| Show one backlog | `"show backlog IDEA-NNN"` — shows the full checklist for a specific idea |
+| Progress tracking | `**Progress**: N / M items` in the file header, updated automatically as tasks are created |
+| Idea status | Idea is set to `Backlogged` when a breakdown is generated |
 
 ---
 
@@ -331,9 +400,13 @@ aidlc-docs/
   state.md              # current phase tracker
   audit.md              # approval timestamps log
   decisions.md          # Q&A decision snapshots, tagged by task ID
-  ideas/                # standalone idea backlog — independent of workflow
+  ideas/                # freeform idea space — independent of workflow
     registry.md         # index of all ideas + status
     IDEA-001.md         # individual idea files (user fills in)
+    ...
+  backlog/              # per-idea implementation breakdowns (one file per idea)
+    IDEA-001.md         # checklist of implementation items for IDEA-001
+    IDEA-002.md
     ...
   reverse-engineering/  # brownfield only — written once, reused across tasks
     business-overview.md
@@ -380,27 +453,43 @@ Sections are created only when relevant.
 ### Idea file
 
 ```markdown
-# IDEA-001: Smarter search with semantic ranking
+# IDEA-001: Real-time notification system
 
-**Status**: Refined
+**Status**: Backlogged
 **Created**: 2026-05-18T09:00:00Z
-**Tags**: search, UX
+**Tags**: notifications, backend, UX
 
 ## Problem Statement
-Search returns exact keyword matches only — misses synonyms and intent.
-
-## Motivation
-Users abandon search when results are poor; churn increases.
+Users miss important updates because there is no real-time feedback in the app.
 
 ## Rough Solution
-Add a vector embedding layer on top of the existing index.
+Add a WebSocket-based notification layer with a persistent bell icon in the UI.
 
-## Open Questions
-- [ ] Which embedding model? (OpenAI vs local)
-- [ ] Acceptable latency budget?
+## Status Log
+| Date | Status | Note |
+|---|---|---|
+| 2026-05-18 | Raw | Created |
+| 2026-05-19 | Backlogged | Breakdown → aidlc-docs/backlog/IDEA-001.md |
+```
 
-## Rough Acceptance
-Search returns relevant results even when the query uses different words.
+### Backlog file (generated from idea)
+
+```markdown
+# Backlog: IDEA-001 — Real-time notification system
+
+**Idea**: IDEA-001
+**Created**: 2026-05-19T08:30:00Z
+**Progress**: 2 / 5 items
+
+---
+
+## Implementation Items
+
+- [x] Design notification data model → TASK-001
+- [x] Build notification service (backend) → TASK-002
+- [ ] Build WebSocket connection handler
+- [ ] Build notification bell UI component
+- [ ] Build notification preferences page
 ```
 
 ### Task ticket
@@ -474,11 +563,11 @@ Continue PROJ-123, or start a new task?
 | | Full AIDLC | AIDLC Minimal |
 |---|---|---|
 | Approval gates | 13+ | **5** (TASK INIT + UNDERSTAND + PLAN + BUILD + DOCUMENT) |
-| Rule files | 28 | **8** |
+| Rule files | 28 | **9** |
 | Docs per project | 20+ | **2–8** |
 | Task ID format | None | **Custom prefix or auto-assigned TASK-NNN** |
 | Requirements capture | In conversation | **Structured template in task file** |
-| Idea backlog | None | **Standalone IDEA-NNN files with promotion flow** |
+| Idea backlog | None | **IDEA-NNN (vision) → AI breakdown checklist → TASK-NNN one by one** |
 | Q&A format | `[Answer]:` in file | `[Answer]:` in file |
 | Decision log | Per-interaction audit | **Key decisions only** |
 | Documentation phase | Manual | **Optional, sources-driven** |
